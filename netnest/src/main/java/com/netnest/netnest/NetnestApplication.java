@@ -1,13 +1,13 @@
-package com.netnest.webchat;
+package com.netnest.netnest;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class WebchatApplication {
+public class NetnestApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(WebchatApplication.class, args);
+		SpringApplication.run(NetnestApplication.class, args);
 	}
 
 }

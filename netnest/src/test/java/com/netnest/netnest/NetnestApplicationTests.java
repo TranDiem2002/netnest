@@ -1,10 +1,10 @@
-package com.netnest.webchat;
+package com.netnest.netnest;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class WebchatApplicationTests {
+class NetnestApplicationTests {
 
 	@Test
 	void contextLoads() {
