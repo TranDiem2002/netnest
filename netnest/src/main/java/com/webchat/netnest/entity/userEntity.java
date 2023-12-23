@@ -2,11 +2,14 @@ package com.webchat.netnest.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 
@@ -18,22 +21,85 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "user")
-public class UserEntity implements UserDetails {
+public class userEntity implements UserDetails {
 
     @Id
     @GeneratedValue
-    private int id;
+    private int userId;
 
-    private String firstName;
-
-    private String lastName;
-
+    @Column(name = "email")
     private String email;
 
-    private String password;
+    @Column(name = "fullName")
+    private String fullName;
+
+    @Column(name = "Gender")
+    private String Gender;
+
+    @Column(name = "dateOfBirth")
+    private Date dateOfBirth;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "userName")
+    private String userName;
+
+    @Column(name = "passWord")
+    private String passWord;
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @ManyToOne
+    private imageEntity image;
+
+    @OneToMany(mappedBy = "user")
+    private List<status_user> time;
+
+    @Column(name = "createDate")
+    @CreatedDate
+    private Date createDate = new Date();
+
+
+    @Column(name = "modifiedDate")
+    @LastModifiedDate
+    private Date modifiedDate = new Date();
+
+    @ManyToMany
+    @JoinTable(name = "following", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "following_id"))
+    private List<userEntity> following;
+
+//    @ManyToMany
+//    @JoinTable(name = "followers", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "follower_id"))
+//    private List<userEntity> followers;
+
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    @OneToMany(mappedBy = "user1")
+    private List<chatEntity> chatUsers;
+
+    @OneToMany(mappedBy = "createBy")
+    private List<messageEntity> createBy;
+
+    @OneToMany(mappedBy = "createBy")
+    private List<postEntity> postEntities;
+
+    @OneToMany(mappedBy = "user")
+    private List<commentEntity> commentEntities;
+
+    @OneToMany(mappedBy = "createBy")
+    private List<requestMessage> requestMessage;
+
+    @OneToMany(mappedBy = "userReceive")
+    private List<requestMessage> requestReceive;
 
 
 
@@ -64,7 +130,7 @@ public class UserEntity implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return passWord;
     }
 
     @Override

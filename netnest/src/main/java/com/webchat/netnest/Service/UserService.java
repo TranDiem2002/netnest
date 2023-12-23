@@ -1,69 +1,31 @@
 package com.webchat.netnest.Service;
 
-import com.webchat.netnest.Config.JwtService;
-import com.webchat.netnest.Model.AuthenticationRequest;
-import com.webchat.netnest.Model.AuthenticationResponse;
-import com.webchat.netnest.Model.RegisterRequest;
-import com.webchat.netnest.Repository.UserRepository;
-import com.webchat.netnest.entity.Role;
-import com.webchat.netnest.entity.UserEntity;
-import com.webchat.netnest.util.UserMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import com.webchat.netnest.Model.ImageModel;
+import com.webchat.netnest.Model.UserModel;
+import com.webchat.netnest.Model.UserProfileModel;
 
-@Service
-public class UserService {
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
 
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+public interface UserService {
 
-    @Autowired
-    private JwtService jwtService;
+//    UserProfileModel createUser(UserProfileModel userModel);
 
-    private UserMapper userMapper;
+    List<UserModel> searchUser(String username) throws SQLException;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    UserProfileModel searchDetailUser(String username);
 
-    public UserService() {
-        this.userMapper = new UserMapper();
-    }
+    void saveFollowing(int userId, String userName);
 
-    public AuthenticationResponse register(RegisterRequest request) {
-//        var user = UserEntity.builder()
-//                .firstName(request.getFirstName())
-//                .lastName(request.getLastName())
-//                .email(request.getEmail())
-//                .password(passwordEncoder.encode(request.getPassword()))
-//                .role(Role.USER)
-//                .build();
-        UserEntity user = userMapper.convertToEntity(request);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.USER);
-        userRepository.save(user);
-        var jwtToken = jwtService.generateToken( user);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
-    }
+    List<UserModel> following(int userId);
+    List<UserModel> followers(int userId);
 
-    public AuthenticationResponse authentication(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassWord()
-                )
-        );
-        var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
-        var jwtToken = jwtService.generateToken( user);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
-    }
+    void updateInformation(UserProfileModel userProfileModel);
+
+    void updateImage (ImageModel image, int userId);
+
+    void logout(Date date, String userEmail);
+
 }

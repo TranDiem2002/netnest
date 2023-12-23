@@ -1,4 +1,4 @@
-package com.webchat.netnest.Model;
+package com.webchat.netnest.Model.Response;
 
 
 import lombok.*;

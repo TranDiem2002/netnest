@@ -1,7 +1,9 @@
-package com.webchat.netnest.Model;
+package com.webchat.netnest.Model.Request;
 
 
 import lombok.*;
+
+import java.util.Date;
 
 @Setter
 @Getter
@@ -11,4 +13,5 @@ public class AuthenticationRequest {
 
     private String email;
     String passWord;
+    private Date dateLogin;
 }
