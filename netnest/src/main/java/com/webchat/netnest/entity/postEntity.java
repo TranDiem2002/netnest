@@ -22,7 +22,7 @@ import java.util.List;
 public class postEntity {
 
     @Id
-    @Column(name = "postID")
+    @GeneratedValue
     private int postID;
 
     @Column(name = "content", columnDefinition = "TEXT")

@@ -7,7 +7,11 @@ import com.webchat.netnest.Model.Response.CommentResponse;
 import java.util.List;
 
 public interface PostService {
+
+    List<PostModel> getPostHome (String userEmail);
     PostModel createImagePost(ImageModel images, int postId);
+
+    PostModel createVideoPost(VideoModel images, int postId);
 
     PostModel createPost(PostModel postModel, String userEmail);
 

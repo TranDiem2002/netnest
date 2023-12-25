@@ -36,9 +36,9 @@ public class SecurityConfiguration {
                   .authenticationProvider(authenticationProvider);
                  http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                          .logout(logout ->
-                            logout.logoutUrl("/logout")
-                            .addLogoutHandler(logoutHandler)
-                            .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()));
+                                         logout.logoutUrl("/logout")
+                                                 .addLogoutHandler(logoutHandler)
+                                                 .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()));
         return http.build();
     }
 }

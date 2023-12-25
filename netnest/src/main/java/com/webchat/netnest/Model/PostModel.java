@@ -24,8 +24,6 @@ public class PostModel {
 
     private Date createDate;
 
-//    private UserProfileModel createBy;
-
     private int countLike;
 
     private UserModel createBy;

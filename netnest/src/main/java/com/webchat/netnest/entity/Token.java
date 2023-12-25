@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -30,4 +32,12 @@ public class Token {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     public userEntity user;
+
+    private Status status;
+
+    @Column(name = "timeLogin")
+    private Date timeLogin;
+
+    @Column(name = "logoutTime")
+    public Date logoutTime;
 }

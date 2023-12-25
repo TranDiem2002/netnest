@@ -28,7 +28,7 @@ public class status_user {
     @Column(name = "timeLogin")
     private Date timeLogin;
 
-    @Column(name = "timeLogout")
-    private Date timeLogout;
+//    @Column(name = "timeLogout")
+//    private Date timeLogout;
 
 }

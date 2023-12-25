@@ -23,9 +23,7 @@ public class UserMapper {
         userProfileModel.setBase64Image(image);
         return userProfileModel;
     }
-//    public UserProfileModel convertProfileModel(userEntity user){
-//        return  modelMapper.map(user, UserProfileModel.class);
-//    }
+
 
     public userEntity convertToEntity(UserProfileModel user){
         return modelMapper.map(user, userEntity.class);
