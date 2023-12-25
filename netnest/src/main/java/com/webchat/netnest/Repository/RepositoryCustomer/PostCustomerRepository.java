@@ -1,15 +1,15 @@
 package com.webchat.netnest.Repository.RepositoryCustomer;
 
-import com.webchat.netnest.entity.commentEntity;
-import com.webchat.netnest.entity.imageEntity;
-import com.webchat.netnest.entity.postEntity;
-import com.webchat.netnest.entity.userEntity;
+import com.webchat.netnest.entity.*;
 
+import java.util.Date;
 import java.util.List;
 
 public interface PostCustomerRepository {
 
     postEntity updateImagePost(imageEntity image, int postId);
+
+    postEntity updateVideoPost(videoEntity video, int postId);
 
     postEntity addLike(int postId, int userId);
 
@@ -23,4 +23,6 @@ public interface PostCustomerRepository {
 
     List<commentEntity> getComment(int postId);
 
+
+    List<postEntity> getPostHome(Date date);
 }

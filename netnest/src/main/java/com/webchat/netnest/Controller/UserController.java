@@ -26,7 +26,6 @@ import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -47,27 +46,18 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register (@RequestBody RegisterRequest request){
-        return ResponseEntity.ok(userServiceDetail.register(request));
+    public ResponseEntity<?> register (@RequestBody RegisterRequest request){
+        String response = userServiceDetail.register(request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authentication (@RequestBody AuthenticationRequest request){
-        return ResponseEntity.ok(userServiceDetail.authentication(request));
+        AuthenticationResponse response = userServiceDetail.authentication(request);
+        userServiceDetail.updateToken(request);
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout (@RequestBody Date date, @AuthenticationPrincipal UserDetails principal){
-        userService.logout(date, principal.getUsername());
-        return ResponseEntity.ok("dang xuat thanh cong");
-    }
-
-//    @PostMapping(value = "/users")
-//    public ResponseEntity<UserProfileModel> saveUser(@RequestBody UserProfileModel user)
-//    {
-//        UserProfileModel userModel = userService.createUser(user);
-//        return new ResponseEntity<>(userModel, HttpStatus.CREATED);
-//    }
 
     @GetMapping(value = "/search/{username}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> searchByUserName(@PathVariable("username") String userName) throws SQLException {
@@ -123,6 +113,12 @@ public class UserController {
         userEntity user = userRepository.findByEmail(principal.getUsername()).get();
         userService.updateImage(imageModel,user.getUserId());
         return ResponseEntity.ok("Update thanh cong");
+    }
+
+    @GetMapping("/suggestFriend")
+    public ResponseEntity<?> suggestUser(@AuthenticationPrincipal UserDetails user){
+        List<UserModel> userModels = userService.suggestFriends(user.getUsername());
+        return ResponseEntity.ok(userModels);
     }
 
 }

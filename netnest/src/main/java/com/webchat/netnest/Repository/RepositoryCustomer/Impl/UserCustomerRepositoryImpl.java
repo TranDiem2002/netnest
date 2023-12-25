@@ -24,15 +24,25 @@ public class UserCustomerRepositoryImpl implements UserCustomerRepository {
     private UserRepository userRepository;
     @Override
     public List<userEntity> findEmailByEmail(String email) {
-        StringBuilder sql = new StringBuilder("select * from user where email = '" + email +"'");
+        StringBuilder sql = new StringBuilder("select * from user where email = '"+email+"'");
+        System.out.println(sql);
         Query query = entityManager.createNativeQuery(sql.toString(), userEntity.class);
         return  query.getResultList();
     }
 
     @Override
     public List<userEntity> findUserByUserName(String username) {
-        StringBuilder sql = new StringBuilder("select * from user where user_name = '" + username +"'");
+        StringBuilder sql = new StringBuilder("select * from user where user_name = '"+username+"'");
         Query query = entityManager.createNativeQuery(sql.toString(), userEntity.class);
+        query.setParameter("username", username);
+        return  query.getResultList();
+    }
+
+    @Override
+    public List<userEntity> findUserByFullName(String fullname) {
+        StringBuilder sql = new StringBuilder("select * from user where full_name = '"+fullname+"'");
+        Query query = entityManager.createNativeQuery(sql.toString(), userEntity.class);
+        query.setParameter("fullname", fullname);
         return  query.getResultList();
     }
 
@@ -115,6 +125,17 @@ public class UserCustomerRepositoryImpl implements UserCustomerRepository {
         userEntity user = userRepository.findById(userId).get();
         user.setImage(image);
         userRepository.save(user);
+    }
+
+    @Override
+    public List<userEntity> suggestFriends(List<userEntity> users) {
+        StringBuilder sql = new StringBuilder("select * from user where user_id not in ( ");
+        for(userEntity user : users){
+            sql.append(user.getUserId() +", ");
+        }
+        sql.append("0)");
+        Query query = entityManager.createNativeQuery(sql.toString(), userEntity.class);
+        return query.getResultList();
     }
 
 

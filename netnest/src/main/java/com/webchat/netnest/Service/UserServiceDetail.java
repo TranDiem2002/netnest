@@ -4,6 +4,9 @@ import com.webchat.netnest.Config.JwtService;
 import com.webchat.netnest.Model.RegisterRequest;
 import com.webchat.netnest.Model.Request.AuthenticationRequest;
 import com.webchat.netnest.Model.Response.AuthenticationResponse;
+import com.webchat.netnest.Repository.RepositoryCustomer.Impl.UserCustomerRepositoryImpl;
+import com.webchat.netnest.Repository.RepositoryCustomer.TokenCustomerRepository;
+import com.webchat.netnest.Repository.RepositoryCustomer.UserCustomerRepository;
 import com.webchat.netnest.Repository.StatusRepository;
 import com.webchat.netnest.Repository.TokenRepository;
 import com.webchat.netnest.Repository.UserRepository;
@@ -15,11 +18,18 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+
 @Service
 public class UserServiceDetail {
 
     @Autowired
     private UserRepository userRepository;
+
+
+    private UserCustomerRepository userCustomerRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -36,6 +46,9 @@ public class UserServiceDetail {
     @Autowired
     private TokenRepository tokenRepository;
 
+    @Autowired
+    private TokenCustomerRepository tokenCustomerRepository;
+
     private UserMapper userMapper;
 
     @Autowired
@@ -43,21 +56,29 @@ public class UserServiceDetail {
 
     public UserServiceDetail() {
         this.userMapper = new UserMapper();
+        this.userCustomerRepository = new UserCustomerRepositoryImpl();
     }
 
-    public AuthenticationResponse register(RegisterRequest request) {
+    public String register(RegisterRequest request) {
         userEntity user = userMapper.convertToEntity(request);
+        if(!userRepository.findByEmail(request.getEmail()).isEmpty()){
+            return "email đã tồn tại";
+        }
+        if(!userRepository.findByUserName(request.getUserName()).isEmpty()){
+            return "user_name đã tồn tại";
+        }if(!userRepository.findByFullName(request.getFullName()).isEmpty()){
+            return "full_name đã tồn tại";
+        }
+
         user.setPassWord(passwordEncoder.encode(request.getPassWord()));
         user.setRole(Role.USER);
         user.setImage(imageService.findImageById(1L).get());
         userRepository.save(user);
-        status_user status_user = new status_user();
-        status_user.setUser(user);
-        statusRepository.save(status_user);
         var jwtToken = jwtService.generateToken( user);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
+        return "đã add user thành công";
+//        return AuthenticationResponse.builder()
+//                .token(jwtToken)
+//                .build();
     }
 
     public AuthenticationResponse authentication(AuthenticationRequest request) {
@@ -69,16 +90,21 @@ public class UserServiceDetail {
         );
         var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         var jwtToken = jwtService.generateToken( user);
-        status_user status = statusRepository.findByUser(user).get();
-        status.setUser(user);
-        status.setStatus(Status.activate);
-        status.setTimeLogin(request.getDateLogin());
-        statusRepository.save(status);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
+    }
+
+    public void updateToken(AuthenticationRequest request){
+        var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+        Token token = tokenCustomerRepository.findByUserId(user.getUserId());
+        token.setStatus(Status.activate);
+        LocalDateTime logoutTime = LocalDateTime.now();
+        Date date = Date.from(logoutTime.atZone(ZoneId.systemDefault()).toInstant());
+        token.setTimeLogin(date);
+        tokenRepository.save(token);
     }
 
     private void saveUserToken (userEntity user, String jwt){

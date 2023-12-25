@@ -4,16 +4,14 @@ import com.webchat.netnest.Repository.CommentRepository;
 import com.webchat.netnest.Repository.PostRepository;
 import com.webchat.netnest.Repository.RepositoryCustomer.PostCustomerRepository;
 import com.webchat.netnest.Repository.UserRepository;
-import com.webchat.netnest.entity.commentEntity;
-import com.webchat.netnest.entity.imageEntity;
-import com.webchat.netnest.entity.postEntity;
-import com.webchat.netnest.entity.userEntity;
+import com.webchat.netnest.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -40,6 +38,15 @@ public class PostCustomerRepositoryImpl implements PostCustomerRepository {
         List<imageEntity> imageEntities = post.getImage();
         imageEntities.add(image);
         post.setImage(imageEntities);
+        return postRepository.save(post);
+    }
+
+    @Override
+    public postEntity updateVideoPost(videoEntity video, int postId) {
+        postEntity post = postRepository.findById(postId).get();
+        List<videoEntity> videoEntities = post.getVideo();
+        videoEntities.add(video);
+        post.setVideo(videoEntities);
         return postRepository.save(post);
     }
 
@@ -95,6 +102,15 @@ public class PostCustomerRepositoryImpl implements PostCustomerRepository {
         StringBuilder sql = new StringBuilder("select * from comment where commentid in (select comment from comment_post where post = :postId)");
         Query query = entityManager.createNativeQuery(sql.toString(), commentEntity.class);
         query.setParameter("postId", postId);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<postEntity> getPostHome(Date date) {
+        StringBuilder sql = new StringBuilder("select postid, content, create_by_user_id, create_date, modified_date, image, video from post inner join image_post on post.postid = image_post.post ");
+        sql.append("inner join video_post on post.postid = video_post.post where post.create_date > :date");
+        Query query = entityManager.createNativeQuery(sql.toString(), postEntity.class);
+        query.setParameter("date", date);
         return query.getResultList();
     }
 

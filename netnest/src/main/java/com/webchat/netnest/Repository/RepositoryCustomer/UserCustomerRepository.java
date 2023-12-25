@@ -10,6 +10,8 @@ public interface UserCustomerRepository {
     List<userEntity> findEmailByEmail(String email);
     List<userEntity> findUserByUserName(String username);
 
+    List<userEntity> findUserByFullName(String username);
+
     List<userEntity> findUserName(String username);
 
 //    List<userEntity> findFollowing(String username);
@@ -26,5 +28,6 @@ public interface UserCustomerRepository {
 
     void updateAvatar(imageEntity image, int userId);
 
+    List<userEntity> suggestFriends(List<userEntity> users);
 
 }

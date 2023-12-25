@@ -18,6 +18,7 @@ public class PostDetail {
     private String content;
 
     private List<String> base64Image;
+    private List<String> base64Video;
     private int countLike;
 
     private UserModel createBy;

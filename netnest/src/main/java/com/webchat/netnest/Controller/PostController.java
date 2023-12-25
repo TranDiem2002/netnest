@@ -1,11 +1,8 @@
 package com.webchat.netnest.Controller;
 
-import com.webchat.netnest.Model.ImageModel;
-import com.webchat.netnest.Model.PostDetail;
-import com.webchat.netnest.Model.PostModel;
+import com.webchat.netnest.Model.*;
 import com.webchat.netnest.Model.Request.CommentRequest;
 import com.webchat.netnest.Model.Response.CommentResponse;
-import com.webchat.netnest.Model.UserModel;
 import com.webchat.netnest.Repository.UserRepository;
 import com.webchat.netnest.Service.ImageService;
 import com.webchat.netnest.Service.Impl.ImageServiceImpl;
@@ -45,9 +42,17 @@ public class PostController {
     @Autowired
     private UserRepository userRepository;
 
+    private List<PostModel> postModels ;
+
     public PostController() {
         this.imageService = new ImageServiceImpl();
         this.userService = new UserServiceImpl();
+    }
+
+    @GetMapping("/home")
+    public ResponseEntity<?> getPost(@AuthenticationPrincipal UserDetails user){
+        List<PostModel> postModels1 = postService.getPostHome(user.getUsername());
+        return ResponseEntity.ok(postModels1);
     }
 
     @PostMapping(value = "/{postId}/newImagePost", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,6 +62,16 @@ public class PostController {
         ImageModel image = new ImageModel();
         image.setImage(blob);
         PostModel savePost = postService.createImagePost(image, postId);
+        return new ResponseEntity<>(savePost, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/{postId}/newVideoPost", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createVideoPost(@RequestParam("video") MultipartFile file, @PathVariable(name = "postId") int postId) throws IOException, SQLException {
+        byte[] bytes = file.getBytes();
+        Blob blob = new SerialBlob(bytes);
+        VideoModel video = new VideoModel();
+        video.setVideo(blob);
+        PostModel savePost = postService.createVideoPost(video, postId);
         return new ResponseEntity<>(savePost, HttpStatus.OK);
     }
 
@@ -105,9 +120,9 @@ public class PostController {
     }
 
 
-    @DeleteMapping(value = "/post/{postId}")
+    @DeleteMapping(value = "/post")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public  void deletePost(@PathVariable(name = "postId") int postId)
+    public  void deletePost(@RequestBody int postId)
     {
         postService.deletePost(postId);
     }

@@ -5,7 +5,6 @@ import com.webchat.netnest.Model.UserModel;
 import com.webchat.netnest.Model.UserProfileModel;
 
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 
 
@@ -26,6 +25,6 @@ public interface UserService {
 
     void updateImage (ImageModel image, int userId);
 
-    void logout(Date date, String userEmail);
+    List<UserModel> suggestFriends(String userEmail);
 
 }

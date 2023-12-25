@@ -10,9 +10,7 @@ import com.webchat.netnest.Repository.StatusRepository;
 import com.webchat.netnest.Repository.UserRepository;
 import com.webchat.netnest.Service.ImageService;
 import com.webchat.netnest.Service.UserService;
-import com.webchat.netnest.entity.Status;
 import com.webchat.netnest.entity.imageEntity;
-import com.webchat.netnest.entity.status_user;
 import com.webchat.netnest.entity.userEntity;
 import com.webchat.netnest.util.ImageMapper;
 import com.webchat.netnest.util.UserMapper;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -179,11 +176,18 @@ public class UserServiceImpl implements UserService {
         }
 
     @Override
-    public void logout(Date date, String userEmail) {
+    public List<UserModel> suggestFriends(String userEmail) {
             userEntity user = userRepository.findByEmail(userEmail).get();
-        status_user status_user = statusRepository.findByUser(user).get();
-        status_user.setTimeLogout(date);
-        status_user.setStatus(Status.inactive);
+            List<userEntity> users = userCustomerRepository.following(user.getUserId());
+            users.add(user);
+            List<userEntity> suggestFriends = userCustomerRepository.suggestFriends(users);
+            List<UserModel> userModels = new ArrayList<>();
+            for(userEntity user1 : suggestFriends){
+                UserModel userModel = new UserModel();
+                userModel = userMapper.convertToModel(user1);
+                userModels.add(userModel);
+            }
+        return userModels;
     }
 
 
