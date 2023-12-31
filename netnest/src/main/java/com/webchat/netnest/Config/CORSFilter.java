@@ -19,11 +19,12 @@ public class CORSFilter implements Filter {
                 throws IOException, ServletException {
             HttpServletResponse response = (HttpServletResponse) res;
             response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control_Allow_Origin", "https://localhost:3000");
             response.setHeader("Access-Control-Allow-Credentials", "true");
-            response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE");
+            response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE, HEAD,*, TRACE, PATCH");
             response.setHeader("Access-Control-Max-Age", "3600");
-            response.setHeader("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Authorization, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers");
-
+            response.setHeader("Access-Control-Allow-Headers", " Content-Type, Authorization, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers");
+//X-Requested-With,
             chain.doFilter(req, res);
         }
 

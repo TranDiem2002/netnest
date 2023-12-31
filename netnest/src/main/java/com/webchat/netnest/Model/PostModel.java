@@ -28,4 +28,7 @@ public class PostModel {
 
     private UserModel createBy;
     private int countComments;
+    private boolean likeStatus;
+    private  boolean followStatus;
+
 }

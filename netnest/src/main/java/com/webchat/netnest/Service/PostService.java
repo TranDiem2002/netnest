@@ -15,9 +15,11 @@ public interface PostService {
 
     PostModel createPost(PostModel postModel, String userEmail);
 
-    PostModel getPost(int postId);
+    PostModel getPost(int postId, String userEmail);
 
     PostModel addLikes(String userEmail, int postId);
+
+    PostModel disLikes(String userEmail, int postId);
 
     List<UserModel> getUserLikes(int postId);
 
@@ -25,7 +27,9 @@ public interface PostService {
 
     List<CommentResponse> getComment(int postId);
 
-    PostDetail getDetailPost(int postId);
+    PostDetail getDetailPost(int postId, String userEmail);
+
+    List<PostUserModel> getPostUser(String userEmail);
 
     void deletePost(int postId);
 

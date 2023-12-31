@@ -2,6 +2,7 @@ package com.webchat.netnest.util;
 
 import com.webchat.netnest.Model.PostDetail;
 import com.webchat.netnest.Model.PostModel;
+import com.webchat.netnest.Model.PostUserModel;
 import com.webchat.netnest.Model.Response.CommentResponse;
 import com.webchat.netnest.Model.UserModel;
 import com.webchat.netnest.entity.commentEntity;
@@ -85,6 +86,20 @@ public class PostMapper {
         String avatarBase = imageMapper.convertBase64(post.getCreateBy().getImage());
         userModel.setBase64Image(avatarBase);
         postModel.setCreateBy(userModel);
+        return postModel;
+    }
+
+
+    public PostUserModel convertToModelProfile(postEntity post){
+        PostUserModel postModel = modelMapper.map(post, PostUserModel.class);
+        if(!post.getImage().isEmpty()){
+            List<String>  images = this.convertImage(post.getImage());
+            postModel.setBase64Image(images);
+        }
+        if(!post.getVideo().isEmpty()){
+            List<String> video = this.convertVideo(post.getVideo());
+            postModel.setBase64video(video);
+        }
         return postModel;
     }
 

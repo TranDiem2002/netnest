@@ -30,6 +30,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
+@CrossOrigin
 public class UserController {
 
     @Autowired
@@ -72,12 +73,18 @@ public class UserController {
         return ResponseEntity.ok(userModel);
     }
 
+    @GetMapping(value = "/UserDetail",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> DetailUser(@AuthenticationPrincipal UserDetails user) {
+        UserProfileModel userModel = userService.DetailUser(user.getUsername());
+        return ResponseEntity.ok(userModel);
+    }
+
     @PostMapping(value = "/users/follow")
 //    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<?> saveFollowing(@AuthenticationPrincipal UserDetails principal, @RequestBody String username)
+    public ResponseEntity<?> saveFollowing(@AuthenticationPrincipal UserDetails principal, @RequestParam(name = "userName") String userName)
     {
         userEntity user = userRepository.findByEmail(principal.getUsername()).get();
-        userService.saveFollowing(user.getUserId(), username);
+        userService.saveFollowing(user.getUserId(), userName);
         return ResponseEntity.ok("Following thanh cong");
     }
 

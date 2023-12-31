@@ -16,6 +16,8 @@ public interface UserService {
 
     UserProfileModel searchDetailUser(String username);
 
+    UserProfileModel DetailUser(String username);
+
     void saveFollowing(int userId, String userName);
 
     List<UserModel> following(int userId);

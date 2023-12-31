@@ -1,6 +1,7 @@
 package com.webchat.netnest.Repository.RepositoryCustomer.Impl;
 
 import com.webchat.netnest.Repository.CommentRepository;
+import com.webchat.netnest.Repository.ImageRepository;
 import com.webchat.netnest.Repository.PostRepository;
 import com.webchat.netnest.Repository.RepositoryCustomer.PostCustomerRepository;
 import com.webchat.netnest.Repository.UserRepository;
@@ -22,11 +23,16 @@ public class PostCustomerRepositoryImpl implements PostCustomerRepository {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ImageRepository imageRepository;
+
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
     private CommentRepository commentRepositry;
+
+
 
     public PostCustomerRepositoryImpl() {
 
@@ -56,6 +62,16 @@ public class PostCustomerRepositoryImpl implements PostCustomerRepository {
         userEntity user = userRepository.findById(userId).get();
         List<userEntity> userEntities = post.getUser();
         userEntities.add(user);
+        post.setUser(userEntities);
+        return postRepository.save(post);
+    }
+
+    @Override
+    public postEntity disLike(int postId, int userId) {
+        postEntity post = postRepository.findById(postId).get();
+        userEntity user = userRepository.findById(userId).get();
+        List<userEntity> userEntities = post.getUser();
+        userEntities.remove(user);
         post.setUser(userEntities);
         return postRepository.save(post);
     }
@@ -106,13 +122,23 @@ public class PostCustomerRepositoryImpl implements PostCustomerRepository {
     }
 
     @Override
-    public List<postEntity> getPostHome(Date date) {
-        StringBuilder sql = new StringBuilder("select postid, content, create_by_user_id, create_date, modified_date, image, video from post inner join image_post on post.postid = image_post.post ");
-        sql.append("inner join video_post on post.postid = video_post.post where post.create_date > :date");
-        Query query = entityManager.createNativeQuery(sql.toString(), postEntity.class);
-        query.setParameter("date", date);
+    public List<Integer> getPostProfile(int userCreateBy) {
+        StringBuilder sql = new StringBuilder("select postid from post where create_by_user_id = :userCreateBy order by create_date asc");
+        Query query = entityManager.createNativeQuery(sql.toString(), Integer.class);
+        query.setParameter("userCreateBy", userCreateBy);
         return query.getResultList();
     }
+
+
+    @Override
+    public List<Integer> getPostHome(Date date) {
+        StringBuilder sql = new StringBuilder("select postid from post where post.create_date > :date");
+        Query query = entityManager.createNativeQuery(sql.toString());
+        query.setParameter("date", date);
+        List<Integer> posts = query.getResultList();
+        return posts;
+    }
+
 
 
 }
