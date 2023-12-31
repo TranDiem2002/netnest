@@ -18,8 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 
 @Service
@@ -101,8 +99,10 @@ public class UserServiceDetail {
         var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         Token token = tokenCustomerRepository.findByUserId(user.getUserId());
         token.setStatus(Status.activate);
-        LocalDateTime logoutTime = LocalDateTime.now();
-        Date date = Date.from(logoutTime.atZone(ZoneId.systemDefault()).toInstant());
+        Date date = new Date();
+        System.out.println(date);
+//        LocalDateTime logoutTime = LocalDateTime.now();
+//        Date date = Date.from(logoutTime.atZone(ZoneId.systemDefault()).toInstant());
         token.setTimeLogin(date);
         tokenRepository.save(token);
     }

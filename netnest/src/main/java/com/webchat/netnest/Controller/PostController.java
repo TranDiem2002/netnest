@@ -81,21 +81,28 @@ public class PostController {
         return new ResponseEntity<>(post, HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "/post/{postId}")
-    public  ResponseEntity<?> getPost(@PathVariable(name = "postId") int postId){
-        PostModel postModel = postService.getPost(postId);
+    @GetMapping(value = "/postID")
+    public  ResponseEntity<?> getPost(@RequestParam(name = "postId") int postId, @AuthenticationPrincipal UserDetails user){
+        PostModel postModel = postService.getPost(postId, user.getUsername());
         return  new ResponseEntity<>(postModel, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/post/{postId}/addLike", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addLikes(@PathVariable(name = "postId") int postId, @AuthenticationPrincipal UserDetails principal)
+    @PostMapping(value = "/post/addLike", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addLikes(@RequestParam(name = "postId") int postId, @AuthenticationPrincipal UserDetails principal)
     {
         PostModel postModel = postService.addLikes(principal.getUsername(), postId);
         return  new ResponseEntity<>(postModel, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/post/{postId}/like", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUserLikes(@PathVariable(name = "postId") int postId){
+    @DeleteMapping(value = "/post/disLike", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> disLikes(@RequestParam(name = "postId") int postId, @AuthenticationPrincipal UserDetails principal)
+    {
+       PostModel postModel = postService.disLikes(principal.getUsername(), postId);
+        return  new ResponseEntity<>(postModel, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/post/like", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getUserLikes(@RequestParam(name = "postId") int postId){
         List<UserModel> postModels = postService.getUserLikes(postId);
         return new ResponseEntity<>(postModels, HttpStatus.OK);
     }
@@ -107,18 +114,23 @@ public class PostController {
         return new ResponseEntity<>(postModel, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/post/{postId}/comment")
-    public ResponseEntity<?> getComment(@PathVariable(name = "postId") int postId){
+    @GetMapping(value = "/post/comment")
+    public ResponseEntity<?> getComment(@RequestParam(name = "postId") int postId){
         List<CommentResponse> commentResponses = postService.getComment(postId);
         return new ResponseEntity<>(commentResponses, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/postDetail/{postId}")
-    public  ResponseEntity<?> getDetailPost(@PathVariable(name = "postId") int postId){
-        PostDetail postDetail = postService.getDetailPost(postId);
+    @GetMapping(value = "/postDetail")
+    public  ResponseEntity<?> getDetailPost(@RequestParam(name = "postId") int postId, @AuthenticationPrincipal UserDetails user){
+        PostDetail postDetail = postService.getDetailPost(postId, user.getUsername());
         return new ResponseEntity<>(postDetail, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/profile/post")
+    public ResponseEntity<?> getPostUser(@AuthenticationPrincipal UserDetails user){
+        List<PostUserModel> postModel = postService.getPostUser(user.getUsername());
+        return ResponseEntity.ok(postModel);
+    }
 
     @DeleteMapping(value = "/post")
     @ResponseStatus(HttpStatus.NO_CONTENT)

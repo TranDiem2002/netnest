@@ -31,10 +31,6 @@ public class UserProfileModel {
 
     private String userName;
 
-    private Date createDate;
-
-    private Date modifiedDate;
-
     private int countfollowing;
 
     private int countfollowers;

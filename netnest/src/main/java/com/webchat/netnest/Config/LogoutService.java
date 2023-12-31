@@ -14,8 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 
 @Service
@@ -45,8 +43,8 @@ public class LogoutService implements LogoutHandler {
 //        var storedToken = tokenRepository.findByToken(jwt).orElse(null);
 //        System.out.println(storedToken.getTimeLogin());
         Token token = tokenCustomerRepository.findByToken(jwt);
-        LocalDateTime logoutTime = LocalDateTime.now();
-        Date date = Date.from(logoutTime.atZone(ZoneId.systemDefault()).toInstant());
+       Date date = new Date();
+        System.out.println(date);
         if(token !=null){
             token.setExpired(true);
             token.setRevoked(true);

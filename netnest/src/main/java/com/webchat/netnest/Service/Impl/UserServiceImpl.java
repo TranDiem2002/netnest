@@ -103,6 +103,17 @@ public class UserServiceImpl implements UserService {
             } return userP;
         }
 
+    public List<UserProfileModel> SDetailUser(String userEmail)  {
+        List<userEntity> user1 = userCustomerRepository.findEmailByEmail(userEmail);
+        List<UserProfileModel> userP = new ArrayList<>();
+        for (userEntity user : user1) {
+//            System.out.println(user.getUserName());
+            String base64Image = this.covertImage(user.getImage().getId());
+            UserProfileModel userProfileModel = userMapper.convertToProfileModel(user, base64Image);
+            userP.add(userProfileModel);
+        } return userP;
+    }
+
         @Override
         public List<UserModel> searchUser(String username)  {
             List<UserProfileModel> users = this.searchPUser(username);
@@ -125,13 +136,22 @@ public class UserServiceImpl implements UserService {
             return userP;
         }
 
-        @Override
+    @Override
+    public UserProfileModel DetailUser(String userEmail) {
+        List<UserProfileModel> users = this.SDetailUser(userEmail);
+        UserProfileModel userP = users.get(0);
+        int countFollowing = userCustomerRepository.countFollowing(userP.getUserId());
+        int countFollowers = userCustomerRepository.countFollowers(userP.getUserId());
+        userP.setCountfollowing(countFollowing);
+        userP.setCountfollowers(countFollowers);
+        return userP;
+    }
+
+    @Override
         public void saveFollowing(int userId, String userName) {
-            List<userEntity> user1 = userCustomerRepository.findUserName(userName);
+           userEntity user = userRepository.findByUserName(userName).get();
             Optional<userEntity> userEntity = userRepository.findById(userId);
-            for (userEntity user : user1){
-                userCustomerRepository.saveFollowing(userEntity.get(), user);
-            }
+            userCustomerRepository.saveFollowing(userEntity.get(), user);
         }
 
         @Override

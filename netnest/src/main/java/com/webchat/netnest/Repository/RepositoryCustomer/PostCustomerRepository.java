@@ -13,6 +13,8 @@ public interface PostCustomerRepository {
 
     postEntity addLike(int postId, int userId);
 
+    postEntity disLike(int postId, int userId);
+
     int countLikes(int postID);
 
     List<userEntity> getUserLikes(int postId);
@@ -23,6 +25,7 @@ public interface PostCustomerRepository {
 
     List<commentEntity> getComment(int postId);
 
+    List<Integer> getPostProfile(int userCreateBy);
 
-    List<postEntity> getPostHome(Date date);
+    List<Integer> getPostHome(Date date);
 }
