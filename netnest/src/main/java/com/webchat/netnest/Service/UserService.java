@@ -12,7 +12,7 @@ public interface UserService {
 
 //    UserProfileModel createUser(UserProfileModel userModel);
 
-    List<UserModel> searchUser(String username) throws SQLException;
+    List<UserModel> searchUser(String username, String userEmail) throws SQLException;
 
     UserProfileModel searchDetailUser(String username);
 
@@ -29,4 +29,7 @@ public interface UserService {
 
     List<UserModel> suggestFriends(String userEmail);
 
+    UserModel getUser(String userEmail);
+
+    boolean getUserActive(int userId);
 }

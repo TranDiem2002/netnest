@@ -1,6 +1,5 @@
 package com.webchat.netnest.Model;
 
-import com.webchat.netnest.Model.Response.MessageResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatModel {
+public class chatUsersModel {
 
     private int chatID;
 
@@ -21,10 +20,11 @@ public class ChatModel {
     private List<UserModel> userOther;
 
 
-    private List<MessageResponse> message;
+    private String message;
 
     private String chatName;
 
-    private boolean statusChat;
-}
+    private String createDateMess;
 
+    private Boolean statusChat;
+}

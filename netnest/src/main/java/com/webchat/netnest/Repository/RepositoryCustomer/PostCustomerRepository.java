@@ -25,6 +25,8 @@ public interface PostCustomerRepository {
 
     List<commentEntity> getComment(int postId);
 
+    int countLikesComment(int comment);
+
     List<Integer> getPostProfile(int userCreateBy);
 
     List<Integer> getPostHome(Date date);

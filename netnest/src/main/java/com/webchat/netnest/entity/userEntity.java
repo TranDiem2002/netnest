@@ -2,8 +2,6 @@ package com.webchat.netnest.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -58,21 +56,15 @@ public class userEntity implements UserDetails {
     private List<status_user> time;
 
     @Column(name = "createDate")
-    @CreatedDate
-    private Date createDate = new Date();
+    private Date createDate;
 
 
     @Column(name = "modifiedDate")
-    @LastModifiedDate
-    private Date modifiedDate = new Date();
+    private Date modifiedDate ;
 
     @ManyToMany
     @JoinTable(name = "following", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "following_id"))
     private List<userEntity> following;
-
-//    @ManyToMany
-//    @JoinTable(name = "followers", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "follower_id"))
-//    private List<userEntity> followers;
 
 
     public String getUserName() {
@@ -82,9 +74,6 @@ public class userEntity implements UserDetails {
     public void setUserName(String userName) {
         this.userName = userName;
     }
-
-    @OneToMany(mappedBy = "user1")
-    private List<chatEntity> chatUsers;
 
     @OneToMany(mappedBy = "createBy")
     private List<messageEntity> createBy;
@@ -101,7 +90,8 @@ public class userEntity implements UserDetails {
     @OneToMany(mappedBy = "userReceive")
     private List<requestMessage> requestReceive;
 
-
+    @OneToMany(mappedBy = "createBy")
+    private List<chatEntity> chat;
 
     @Override
     public String getUsername() {
