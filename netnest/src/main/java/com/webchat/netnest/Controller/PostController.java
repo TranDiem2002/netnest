@@ -94,15 +94,15 @@ public class PostController {
         return  new ResponseEntity<>(postModel, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/post/disLike", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/post/dislike", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> disLikes(@RequestParam(name = "postId") int postId, @AuthenticationPrincipal UserDetails principal)
     {
        PostModel postModel = postService.disLikes(principal.getUsername(), postId);
         return  new ResponseEntity<>(postModel, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/post/like", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUserLikes(@RequestParam(name = "postId") int postId){
+    @GetMapping(value = "/post/UserLike", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getUserLikes(@RequestParam(name = "postId") int postId, @AuthenticationPrincipal UserDetails principal){
         List<UserModel> postModels = postService.getUserLikes(postId);
         return new ResponseEntity<>(postModels, HttpStatus.OK);
     }
@@ -110,14 +110,21 @@ public class PostController {
     @PostMapping(value = "/post/{postId}/addComments")
     public ResponseEntity<?> addComment(@PathVariable(name = "postId") int postId, @RequestBody CommentRequest commentRequest,
                                         @AuthenticationPrincipal UserDetails principal){
-        PostModel postModel = postService.addComment(postId, commentRequest, principal.getUsername());
-        return new ResponseEntity<>(postModel, HttpStatus.OK);
+        List<CommentResponse> comment = postService.addComment(postId, commentRequest, principal.getUsername());
+        return new ResponseEntity<>(comment, HttpStatus.OK);
     }
 
     @GetMapping(value = "/post/comment")
-    public ResponseEntity<?> getComment(@RequestParam(name = "postId") int postId){
-        List<CommentResponse> commentResponses = postService.getComment(postId);
+    public ResponseEntity<?> getComment(@RequestParam(name = "postId") int postId, @AuthenticationPrincipal UserDetails user){
+        List<CommentResponse> commentResponses = postService.getComment(postId, user.getUsername());
         return new ResponseEntity<>(commentResponses, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/post/addLikeComment", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addLikesComment(@RequestParam(name = "commentId") int commentId, @AuthenticationPrincipal UserDetails principal)
+    {
+        CommentResponse commentResponse = postService.addLikeComment(commentId, principal.getUsername());
+        return  new ResponseEntity<>(commentResponse, HttpStatus.OK);
     }
 
     @GetMapping(value = "/postDetail")

@@ -1,5 +1,6 @@
 package com.webchat.netnest.Repository.RepositoryCustomer;
 
+import com.webchat.netnest.entity.Token;
 import com.webchat.netnest.entity.imageEntity;
 import com.webchat.netnest.entity.userEntity;
 
@@ -13,6 +14,7 @@ public interface UserCustomerRepository {
     List<userEntity> findUserByFullName(String username);
 
     List<userEntity> findUserName(String username);
+
 
 //    List<userEntity> findFollowing(String username);
 
@@ -29,5 +31,7 @@ public interface UserCustomerRepository {
     void updateAvatar(imageEntity image, int userId);
 
     List<userEntity> suggestFriends(List<userEntity> users);
+
+    List<Token> getStatusUser(int userId);
 
 }

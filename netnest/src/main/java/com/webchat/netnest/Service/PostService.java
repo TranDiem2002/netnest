@@ -23,9 +23,11 @@ public interface PostService {
 
     List<UserModel> getUserLikes(int postId);
 
-    PostModel addComment(int postId, CommentRequest commentRequest, String userEmail);
+    List<CommentResponse> addComment(int postId, CommentRequest commentRequest, String userEmail);
 
-    List<CommentResponse> getComment(int postId);
+    List<CommentResponse> getComment(int postId, String userEmail);
+
+    CommentResponse addLikeComment(int commentId, String UserEmail);
 
     PostDetail getDetailPost(int postId, String userEmail);
 

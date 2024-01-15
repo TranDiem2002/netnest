@@ -29,7 +29,7 @@ public class TokenCustomerRepository {
     }
 
     public List<Token> findUserId(int userId){
-        StringBuilder sql = new StringBuilder("select * from token where user_id = :userId order by logout_time desc limit  2");
+        StringBuilder sql = new StringBuilder("select * from token where user_id = :userId order by logout_time desc limit 1");
         Query query = entityManager.createNativeQuery(sql.toString(), Token.class);
         query.setParameter("userId", userId);
         return  query.getResultList();

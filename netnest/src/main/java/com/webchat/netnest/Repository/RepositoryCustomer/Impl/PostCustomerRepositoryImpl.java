@@ -122,6 +122,15 @@ public class PostCustomerRepositoryImpl implements PostCustomerRepository {
     }
 
     @Override
+    public int countLikesComment(int comment) {
+        StringBuilder sql = new StringBuilder("select count(user) from comment_like where comment = :commentId");
+        Query query = entityManager.createNativeQuery(sql.toString());
+        query.setParameter("commentId", comment);
+        Number result = (Number) query.getSingleResult();
+        return result.intValue();
+    }
+
+    @Override
     public List<Integer> getPostProfile(int userCreateBy) {
         StringBuilder sql = new StringBuilder("select postid from post where create_by_user_id = :userCreateBy order by create_date asc");
         Query query = entityManager.createNativeQuery(sql.toString(), Integer.class);
@@ -132,7 +141,7 @@ public class PostCustomerRepositoryImpl implements PostCustomerRepository {
 
     @Override
     public List<Integer> getPostHome(Date date) {
-        StringBuilder sql = new StringBuilder("select postid from post where post.create_date > :date");
+        StringBuilder sql = new StringBuilder("select postid from post where post.create_date < :date");
         Query query = entityManager.createNativeQuery(sql.toString());
         query.setParameter("date", date);
         List<Integer> posts = query.getResultList();

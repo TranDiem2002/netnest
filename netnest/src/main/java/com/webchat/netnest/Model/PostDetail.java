@@ -22,6 +22,7 @@ public class PostDetail {
     private int countLike;
 
     private UserModel createBy;
+    private String CreateDate;
     private List<CommentResponse> comments;
     private boolean likeStatus;
     private boolean followStatus;

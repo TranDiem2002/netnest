@@ -68,6 +68,8 @@ public class UserServiceDetail {
             return "full_name đã tồn tại";
         }
 
+
+
         user.setPassWord(passwordEncoder.encode(request.getPassWord()));
         user.setRole(Role.USER);
         user.setImage(imageService.findImageById(1L).get());
@@ -95,23 +97,17 @@ public class UserServiceDetail {
                 .build();
     }
 
-    public void updateToken(AuthenticationRequest request){
-        var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
-        Token token = tokenCustomerRepository.findByUserId(user.getUserId());
-        token.setStatus(Status.activate);
-        Date date = new Date();
-        System.out.println(date);
-//        LocalDateTime logoutTime = LocalDateTime.now();
-//        Date date = Date.from(logoutTime.atZone(ZoneId.systemDefault()).toInstant());
-        token.setTimeLogin(date);
-        tokenRepository.save(token);
-    }
+
 
     private void saveUserToken (userEntity user, String jwt){
+        Date date = new Date();
+
         var token = Token.builder()
                 .user(user)
                 .token(jwt)
                 .tokenType(TokenType.BEARER)
+                .status(Status.activate)
+                .timeLogin(date)
                 .expired(false)
                 .revoked(false)
                 .build();

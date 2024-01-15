@@ -55,14 +55,13 @@ public class UserController {
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authentication (@RequestBody AuthenticationRequest request){
         AuthenticationResponse response = userServiceDetail.authentication(request);
-        userServiceDetail.updateToken(request);
         return ResponseEntity.ok(response);
     }
 
 
     @GetMapping(value = "/search/{username}",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> searchByUserName(@PathVariable("username") String userName) throws SQLException {
-        List<UserModel> userModel = userService.searchUser(userName);
+    public ResponseEntity<?> searchByUserName(@PathVariable("username") String userName, @AuthenticationPrincipal UserDetails user) throws SQLException {
+        List<UserModel> userModel = userService.searchUser(userName, user.getUsername());
         return ResponseEntity.ok(userModel);
     }
 
@@ -127,5 +126,6 @@ public class UserController {
         List<UserModel> userModels = userService.suggestFriends(user.getUsername());
         return ResponseEntity.ok(userModels);
     }
+
 
 }

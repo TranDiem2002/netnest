@@ -2,6 +2,7 @@ package com.webchat.netnest.Repository.RepositoryCustomer.Impl;
 
 import com.webchat.netnest.Repository.RepositoryCustomer.UserCustomerRepository;
 import com.webchat.netnest.Repository.UserRepository;
+import com.webchat.netnest.entity.Token;
 import com.webchat.netnest.entity.imageEntity;
 import com.webchat.netnest.entity.userEntity;
 import jakarta.persistence.EntityManager;
@@ -48,10 +49,11 @@ public class UserCustomerRepositoryImpl implements UserCustomerRepository {
 
     @Override
     public List<userEntity> findUserName(String username) {
-        StringBuilder sql = new StringBuilder("select * from user where user_name like '%" + username +"%'");
+        StringBuilder sql = new StringBuilder("select * from user where user_name like '%" + username +"%' or full_name like '%" + username +"%'");
         Query query = entityManager.createNativeQuery(sql.toString(), userEntity.class);
         return  query.getResultList();
     }
+
 
     @Override
     public void saveFollowing(userEntity user, userEntity userFollowing) {
@@ -135,6 +137,14 @@ public class UserCustomerRepositoryImpl implements UserCustomerRepository {
         }
         sql.append("0)");
         Query query = entityManager.createNativeQuery(sql.toString(), userEntity.class);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Token> getStatusUser(int userId) {
+        StringBuilder sql = new StringBuilder("select * from token where revoked = 0 and user_id = :userId ");
+        Query query = entityManager.createNativeQuery(sql.toString(), Token.class);
+        query.setParameter("userId", userId);
         return query.getResultList();
     }
 

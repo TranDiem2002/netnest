@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
 import java.util.List;
 
 @Setter
@@ -22,7 +21,7 @@ public class PostModel {
 
     private List<String> base64video;
 
-    private Date createDate;
+    private String createDate;
 
     private int countLike;
 

@@ -20,4 +20,7 @@ public class CommentResponse {
 
     private Date modifiedDate;
 
+    private int countLike;
+    private boolean statusLike;
+
 }

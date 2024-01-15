@@ -10,6 +10,7 @@ import com.webchat.netnest.Repository.StatusRepository;
 import com.webchat.netnest.Repository.UserRepository;
 import com.webchat.netnest.Service.ImageService;
 import com.webchat.netnest.Service.UserService;
+import com.webchat.netnest.entity.Token;
 import com.webchat.netnest.entity.imageEntity;
 import com.webchat.netnest.entity.userEntity;
 import com.webchat.netnest.util.ImageMapper;
@@ -54,28 +55,6 @@ public class UserServiceImpl implements UserService {
         }
 
 
-//        @Override
-//        public UserProfileModel createUser(UserProfileModel userModel) {
-//            List<userEntity> users = userCustomerRepository.findEmailByEmail(userModel.getEmail());
-//            if(users.size() > 0){
-//                userEntity user1 = new userEntity();
-//                user1.setEmail(users.get(0).getEmail());
-//                return userMapper.convertToProfileModel(user1);
-//            }
-//
-//            List<userEntity> users1 = userCustomerRepository.findUserByUserName(userModel.getUserName());
-//            if(users1.size() > 0){
-//                userEntity user1 = new userEntity();
-//                user1.setUserName(users1.get(0).getUsername());
-//                return userMapper.convertToProfileModel(user1);
-//            }
-//
-//            userEntity user = userMapper.convertToEntity(userModel);
-//            user.setImage(imageService.findImageById(1L).get());
-//            userEntity saveUser = userRepository.save(user);
-//            return userMapper.convertToProfileModel(saveUser);
-//        }
-
         public String covertImage(Long imageId){
             String base64Image = null;
             Optional<imageEntity> image = imageService.findImageById(imageId);
@@ -92,6 +71,8 @@ public class UserServiceImpl implements UserService {
             return base64Image;
         }
 
+
+        // tim kiem theo userName
         public List<UserProfileModel> searchPUser(String username)  {
             List<userEntity> user1 = userCustomerRepository.findUserName(username);
             List<UserProfileModel> userP = new ArrayList<>();
@@ -103,11 +84,26 @@ public class UserServiceImpl implements UserService {
             } return userP;
         }
 
+    public List<UserProfileModel> searchUserOther(String username, userEntity userEntity)  {
+        List<userEntity> user1 = userCustomerRepository.findUserName(username);
+        List<UserProfileModel> userP = new ArrayList<>();
+        for (userEntity user : user1) {
+            if (user.getUserId() == userEntity.getUserId()) {
+                user1.remove(user);
+            }
+        }
+        for (userEntity user : user1) {
+                String base64Image = this.covertImage(user.getImage().getId());
+                UserProfileModel userProfileModel = userMapper.convertToProfileModel(user, base64Image);
+                userP.add(userProfileModel);
+        } return userP;
+    }
+
+        // tifm kieems theo Email
     public List<UserProfileModel> SDetailUser(String userEmail)  {
         List<userEntity> user1 = userCustomerRepository.findEmailByEmail(userEmail);
         List<UserProfileModel> userP = new ArrayList<>();
         for (userEntity user : user1) {
-//            System.out.println(user.getUserName());
             String base64Image = this.covertImage(user.getImage().getId());
             UserProfileModel userProfileModel = userMapper.convertToProfileModel(user, base64Image);
             userP.add(userProfileModel);
@@ -115,8 +111,9 @@ public class UserServiceImpl implements UserService {
     }
 
         @Override
-        public List<UserModel> searchUser(String username)  {
-            List<UserProfileModel> users = this.searchPUser(username);
+        public List<UserModel> searchUser(String username, String userEmail)  {
+            userEntity userEntity = userRepository.findByEmail(userEmail).get();
+            List<UserProfileModel> users = this.searchUserOther(username, userEntity);
             List<UserModel> userModels = new ArrayList<>();
             for(UserProfileModel user : users){
                 UserModel userModel = userMapper.convertPToModel(user);
@@ -208,6 +205,26 @@ public class UserServiceImpl implements UserService {
                 userModels.add(userModel);
             }
         return userModels;
+    }
+
+    @Override
+    public UserModel getUser(String userEmail) {
+        List<UserProfileModel> users = this.SDetailUser(userEmail);
+        List<UserModel> userModels = new ArrayList<>();
+        for(UserProfileModel user : users){
+            UserModel userModel = userMapper.convertPToModel(user);
+            userModels.add(userModel);
+        }
+        return userModels.get(0);
+    }
+
+    @Override
+    public boolean getUserActive(int userId) {
+        List<Token> token = userCustomerRepository.getStatusUser(userId);
+        if(!token.isEmpty()){
+            return true;
+        }
+        return false;
     }
 
 
