@@ -1,9 +1,11 @@
 package com.webchat.netnest.Controller;
 
 
+import com.webchat.netnest.Config.LogoutService;
 import com.webchat.netnest.Model.ImageModel;
 import com.webchat.netnest.Model.RegisterRequest;
 import com.webchat.netnest.Model.Request.AuthenticationRequest;
+import com.webchat.netnest.Model.Request.ChangePassword;
 import com.webchat.netnest.Model.Response.AuthenticationResponse;
 import com.webchat.netnest.Model.UserModel;
 import com.webchat.netnest.Model.UserProfileModel;
@@ -14,6 +16,7 @@ import com.webchat.netnest.Service.UserServiceDetail;
 import com.webchat.netnest.entity.userEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -45,6 +48,9 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private LogoutService logoutService;
+
 
     @PostMapping("/register")
     public ResponseEntity<?> register (@RequestBody RegisterRequest request){
@@ -58,6 +64,13 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/changePassword")
+    public  ResponseEntity<?> changePassword(@RequestBody ChangePassword changePassword, @AuthenticationPrincipal UserDetails user){
+        String notice =   userServiceDetail.changePassWord(user.getUsername(), changePassword);
+     return ResponseEntity.ok(notice);
+    }
+
+
 
     @GetMapping(value = "/search/{username}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> searchByUserName(@PathVariable("username") String userName, @AuthenticationPrincipal UserDetails user) throws SQLException {
@@ -66,9 +79,9 @@ public class UserController {
     }
 
 
-    @GetMapping(value = "/searchDetail/{username}",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> searchDetailByUser(@PathVariable("username") String userName) {
-        UserProfileModel userModel = userService.searchDetailUser(userName);
+    @GetMapping(value = "/searchDetail",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> searchDetailByUser(@RequestParam("username") String userName, @AuthenticationPrincipal UserDetails user) {
+        UserProfileModel userModel = userService.searchDetailUser(userName, user.getUsername());
         return ResponseEntity.ok(userModel);
     }
 
@@ -79,12 +92,17 @@ public class UserController {
     }
 
     @PostMapping(value = "/users/follow")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<?> saveFollowing(@AuthenticationPrincipal UserDetails principal, @RequestParam(name = "userName") String userName)
     {
         userEntity user = userRepository.findByEmail(principal.getUsername()).get();
         userService.saveFollowing(user.getUserId(), userName);
         return ResponseEntity.ok("Following thanh cong");
+    }
+
+    @DeleteMapping(value = "/unFollow")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFollowing(@AuthenticationPrincipal UserDetails user, @RequestParam(name = "userId") int userId){
+        userService.deleteFollowing(userId, user.getUsername());
     }
 
     @GetMapping(value = "/following", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -99,6 +117,18 @@ public class UserController {
         userEntity user = userRepository.findByEmail(principal.getUsername()).get();
         List<UserModel> following = userService.followers(user.getUserId());
         return ResponseEntity.ok(following);
+    }
+
+    @GetMapping("/followingUser")
+    public ResponseEntity<?> getFollowingUser(@RequestParam int userId, @AuthenticationPrincipal UserDetails user){
+        List<UserModel> following = userService.followingUser(userId, user.getUsername());
+        return ResponseEntity.ok(following);
+    }
+
+    @GetMapping("/followersUser")
+    public ResponseEntity<?> getFollowerUser(@RequestParam int userId, @AuthenticationPrincipal UserDetails user){
+        List<UserModel> followers= userService.followersUser(userId, user.getUsername());
+        return ResponseEntity.ok(followers);
     }
 
     @PutMapping(value = "/user/update")

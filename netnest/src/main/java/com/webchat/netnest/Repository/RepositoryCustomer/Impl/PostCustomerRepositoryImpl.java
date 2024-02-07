@@ -12,7 +12,6 @@ import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -96,10 +95,10 @@ public class PostCustomerRepositoryImpl implements PostCustomerRepository {
 
     @Override
     public postEntity addComment(int postId, commentEntity comment) {
-        commentEntity saveComment = commentRepositry.save(comment);
+//        commentEntity saveComment = commentRepositry.save(comment);
         postEntity post = postRepository.findById(postId).get();
         List<commentEntity> commentEntities = post.getCommentEntities();
-        commentEntities.add(saveComment);
+        commentEntities.add(comment);
         post.setCommentEntities(commentEntities);
         return postRepository.save(post);
     }
@@ -138,16 +137,33 @@ public class PostCustomerRepositoryImpl implements PostCustomerRepository {
         return query.getResultList();
     }
 
-
     @Override
-    public List<Integer> getPostHome(Date date) {
-        StringBuilder sql = new StringBuilder("select postid from post where post.create_date < :date");
+    public List<Integer> getPostHome(int userId) {
+        StringBuilder sql = new StringBuilder("select postid from post where post.create_date >= DATE_SUB(NOW(), INTERVAL 3 DAY) ");
+        sql.append(" and create_by_user_id <> :userId and create_by_user_id in (SELECT following.following_id from following");
+        sql.append("  WHERE following.user_id = :userId) order by post.create_date desc");
         Query query = entityManager.createNativeQuery(sql.toString());
-        query.setParameter("date", date);
+        query.setParameter("userId",userId);
         List<Integer> posts = query.getResultList();
         return posts;
     }
 
+
+//    SELECT user_id from user where user.user_id not in (select following.following_id from following where following.user_id = 1)
+    @Override
+    public List<Integer> suggestPost(List<Integer> postId,int userId) {
+        StringBuilder sql = new StringBuilder("select postid from post where post.create_date >= DATE_SUB(NOW(), INTERVAL 3 DAY) ");
+        sql.append(" and create_by_user_id <> :userId and create_by_user_id in (SELECT user_id from user where user.user_id not in ");
+        sql.append("(select following.following_id from following where following.user_id = :userId)) and postid not in ( 0 ");
+        for(Integer i : postId){
+            sql.append( ","+ i );
+        }
+        sql.append(" ) order by post.create_date desc");
+        Query query = entityManager.createNativeQuery(sql.toString());
+        query.setParameter("userId",userId);
+        List<Integer> posts = query.getResultList();
+        return posts;
+    }
 
 
 }

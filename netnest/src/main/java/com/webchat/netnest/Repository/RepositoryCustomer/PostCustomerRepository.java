@@ -2,7 +2,6 @@ package com.webchat.netnest.Repository.RepositoryCustomer;
 
 import com.webchat.netnest.entity.*;
 
-import java.util.Date;
 import java.util.List;
 
 public interface PostCustomerRepository {
@@ -29,5 +28,7 @@ public interface PostCustomerRepository {
 
     List<Integer> getPostProfile(int userCreateBy);
 
-    List<Integer> getPostHome(Date date);
+    List<Integer> getPostHome(int userId);
+
+    List<Integer> suggestPost(List<Integer> postId, int userId);
 }

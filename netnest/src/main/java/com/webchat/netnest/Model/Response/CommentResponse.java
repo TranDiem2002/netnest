@@ -16,7 +16,7 @@ public class CommentResponse {
     private int commentID;
     private UserModel user;
     private String comment;
-    private Date createDate;
+    private String createDate;
 
     private Date modifiedDate;
 

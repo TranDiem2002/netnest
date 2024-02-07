@@ -34,4 +34,6 @@ public interface UserCustomerRepository {
 
     List<Token> getStatusUser(int userId);
 
+    List<Integer> checkFollow(int userId, int userEmail);
+
 }

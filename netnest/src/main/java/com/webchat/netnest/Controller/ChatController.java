@@ -45,7 +45,7 @@ public class ChatController {
     }
 
 
-    @GetMapping("/chat/search")
+    @PostMapping("/chat/search")
     public ResponseEntity<?> searchChat(@AuthenticationPrincipal UserDetails user, @RequestBody List<UserModel> users){
         ChatModel chatModels = chatService.searchChat(user.getUsername(), users);
         return  ResponseEntity.ok(chatModels);
@@ -96,4 +96,12 @@ public class ChatController {
         List<chatUsersModel> chat = chatService.getChatModel(user.getUsername());
         return ResponseEntity.ok(chat);
     }
+
+    @PostMapping("/chat/changeNameChat")
+    public  ResponseEntity<?> changeNameChat(@AuthenticationPrincipal UserDetails user, @RequestParam int chatId, @RequestParam String nameChat){
+        String chatName = chatService.changeChatName(user.getUsername(), chatId, nameChat);
+        return ResponseEntity.ok(chatName);
+    }
+
+
 }

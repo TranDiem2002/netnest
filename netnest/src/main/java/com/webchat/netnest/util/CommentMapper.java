@@ -8,7 +8,9 @@ import com.webchat.netnest.entity.imageEntity;
 import com.webchat.netnest.entity.userEntity;
 import org.modelmapper.ModelMapper;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class CommentMapper {
@@ -24,6 +26,11 @@ public class CommentMapper {
         this.userMapper = new UserMapper();
     }
 
+    public String convertTimetoString(Date date){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = dateFormat.format(date);
+        return formattedDate;
+    }
 
     public List<String> convetImage(List<imageEntity> imageEntities){
         List<String> images = new ArrayList<>();
@@ -40,6 +47,7 @@ public class CommentMapper {
         CommentResponse commentResponse = modelMapper.map(comment, CommentResponse.class);
         userModel.setBase64Image(imageMapper.convertBase64(user.getImage()));
         commentResponse.setUser(userModel);
+        commentResponse.setCreateDate(convertTimetoString(comment.getCreateDate()));
         return commentResponse;
     }
 

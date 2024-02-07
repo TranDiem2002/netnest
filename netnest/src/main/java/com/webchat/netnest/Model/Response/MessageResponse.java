@@ -22,5 +22,6 @@ public class MessageResponse {
 
     private String createDate;
 
+    private Boolean statusMess;
 
 }

@@ -69,7 +69,7 @@ public class ChatMapper {
             userModels.add(userModel);
         }
         chatModel.setUserOther(userModels);
-        if(!chat.getMessageEntities().isEmpty()){
+        if(!(chat.getMessageEntities().isEmpty())){
             chatModel.setMessage(convertResponse(chat.getMessageEntities()));
         }
         chatModel.setChatName(chat.getChatName());

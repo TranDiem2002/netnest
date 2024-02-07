@@ -9,6 +9,7 @@ import com.webchat.netnest.Service.Impl.ImageServiceImpl;
 import com.webchat.netnest.Service.Impl.UserServiceImpl;
 import com.webchat.netnest.Service.PostService;
 import com.webchat.netnest.Service.UserService;
+import com.webchat.netnest.entity.userEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -81,6 +82,8 @@ public class PostController {
         return new ResponseEntity<>(post, HttpStatus.CREATED);
     }
 
+
+
     @GetMapping(value = "/postID")
     public  ResponseEntity<?> getPost(@RequestParam(name = "postId") int postId, @AuthenticationPrincipal UserDetails user){
         PostModel postModel = postService.getPost(postId, user.getUsername());
@@ -114,6 +117,14 @@ public class PostController {
         return new ResponseEntity<>(comment, HttpStatus.OK);
     }
 
+
+    @DeleteMapping("/post/deleteComment")
+    public  ResponseEntity<?> deleteComment(@AuthenticationPrincipal userEntity user, @RequestParam int commentId, @RequestParam  int postId){
+        List<CommentResponse> commentResponses = postService.deleteComment(postId,commentId, user.getUsername());
+        return  ResponseEntity.ok(commentResponses);
+    }
+
+
     @GetMapping(value = "/post/comment")
     public ResponseEntity<?> getComment(@RequestParam(name = "postId") int postId, @AuthenticationPrincipal UserDetails user){
         List<CommentResponse> commentResponses = postService.getComment(postId, user.getUsername());
@@ -125,6 +136,12 @@ public class PostController {
     {
         CommentResponse commentResponse = postService.addLikeComment(commentId, principal.getUsername());
         return  new ResponseEntity<>(commentResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("/post/DeleteLikeComment")
+    public ResponseEntity<?> dislikeComment(@AuthenticationPrincipal UserDetails user,@RequestParam int commentId){
+        CommentResponse commentResponses = postService.deleteLikeComment(commentId, user.getUsername());
+        return ResponseEntity.ok(commentResponses);
     }
 
     @GetMapping(value = "/postDetail")
@@ -139,9 +156,15 @@ public class PostController {
         return ResponseEntity.ok(postModel);
     }
 
+    @GetMapping(value = "/profile/SearchPost")
+    public ResponseEntity<?> getPostSearchUser(@RequestParam(name = "userId") int userId, @AuthenticationPrincipal UserDetails user){
+        List<PostUserModel> postModel = postService.getPostSearchUser(userId);
+        return ResponseEntity.ok(postModel);
+    }
+
     @DeleteMapping(value = "/post")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public  void deletePost(@RequestBody int postId)
+    public  void deletePost(@RequestParam(name = "postId") int postId)
     {
         postService.deletePost(postId);
     }

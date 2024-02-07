@@ -3,6 +3,7 @@ package com.webchat.netnest.Service;
 import com.webchat.netnest.Config.JwtService;
 import com.webchat.netnest.Model.RegisterRequest;
 import com.webchat.netnest.Model.Request.AuthenticationRequest;
+import com.webchat.netnest.Model.Request.ChangePassword;
 import com.webchat.netnest.Model.Response.AuthenticationResponse;
 import com.webchat.netnest.Repository.RepositoryCustomer.Impl.UserCustomerRepositoryImpl;
 import com.webchat.netnest.Repository.RepositoryCustomer.TokenCustomerRepository;
@@ -68,8 +69,6 @@ public class UserServiceDetail {
             return "full_name đã tồn tại";
         }
 
-
-
         user.setPassWord(passwordEncoder.encode(request.getPassWord()));
         user.setRole(Role.USER);
         user.setImage(imageService.findImageById(1L).get());
@@ -97,7 +96,18 @@ public class UserServiceDetail {
                 .build();
     }
 
-
+    public String changePassWord (String userEmail, ChangePassword changePassword){
+        var user = userRepository.findByEmail(userEmail).get();
+        if(!passwordEncoder.matches(changePassword.getCurrentPassword(),user.getPassword())){
+           return "Wrong password!";
+        }
+        if(!changePassword.getNewPassword().equals(changePassword.getConfirmPassword())){
+          return "Password not the same!";
+        }
+        user.setPassWord(passwordEncoder.encode(changePassword.getNewPassword()));
+        userRepository.save(user);
+        return "success";
+    }
 
     private void saveUserToken (userEntity user, String jwt){
         Date date = new Date();

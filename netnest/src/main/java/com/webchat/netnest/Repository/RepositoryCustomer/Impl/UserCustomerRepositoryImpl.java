@@ -26,7 +26,6 @@ public class UserCustomerRepositoryImpl implements UserCustomerRepository {
     @Override
     public List<userEntity> findEmailByEmail(String email) {
         StringBuilder sql = new StringBuilder("select * from user where email = '"+email+"'");
-        System.out.println(sql);
         Query query = entityManager.createNativeQuery(sql.toString(), userEntity.class);
         return  query.getResultList();
     }
@@ -145,6 +144,15 @@ public class UserCustomerRepositoryImpl implements UserCustomerRepository {
         StringBuilder sql = new StringBuilder("select * from token where revoked = 0 and user_id = :userId ");
         Query query = entityManager.createNativeQuery(sql.toString(), Token.class);
         query.setParameter("userId", userId);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Integer> checkFollow(int userId, int userEmail) {
+        StringBuilder sql = new StringBuilder("select following_id from following where user_id = :userEmail and following_id = :userId");
+        Query query = entityManager.createNativeQuery(sql.toString());
+        query.setParameter("userId", userId);
+        query.setParameter("userEmail", userEmail);
         return query.getResultList();
     }
 

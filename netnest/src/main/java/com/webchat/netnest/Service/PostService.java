@@ -25,6 +25,10 @@ public interface PostService {
 
     List<CommentResponse> addComment(int postId, CommentRequest commentRequest, String userEmail);
 
+    List<CommentResponse> deleteComment(int postId, int commentId, String userEmail);
+
+    CommentResponse deleteLikeComment(int commentId, String userEmail);
+
     List<CommentResponse> getComment(int postId, String userEmail);
 
     CommentResponse addLikeComment(int commentId, String UserEmail);
@@ -32,6 +36,8 @@ public interface PostService {
     PostDetail getDetailPost(int postId, String userEmail);
 
     List<PostUserModel> getPostUser(String userEmail);
+
+    List<PostUserModel> getPostSearchUser(int userId);
 
     void deletePost(int postId);
 

@@ -27,4 +27,5 @@ public class chatUsersModel {
     private String createDateMess;
 
     private Boolean statusChat;
+
 }

@@ -63,7 +63,7 @@ public class ChatServiceImpl implements ChatService {
         List<chatEntity> chatEntities = new ArrayList<>();
        for(Integer id : chatID){
            chatEntity chat = chatRepository.findById(id).get();
-           if(!chat.getMessageEntities().isEmpty()){
+           if(!chat.getMessageEntities().isEmpty() && chat.getUserChat().size()>=2){
                chatEntities.add(chat);
            }
        }
@@ -74,6 +74,7 @@ public class ChatServiceImpl implements ChatService {
             List<userEntity> userEntities = chat.getUserChat();
             userEntities.remove(user);
                 for (userEntity user1: userEntities){
+                    status = false;
                     boolean statusUser = userService.getUserActive(user1.getUserId());
                     if (statusUser){
                         status = statusUser;
@@ -91,7 +92,7 @@ public class ChatServiceImpl implements ChatService {
         userEntity user = userRepository.findByEmail(userEmail).get();
         List<ChatStatus> chatStatuses = new ArrayList<>();
         String mess;
-        boolean status = false;
+//        boolean status = false;
         for (Integer i : chatId){
             ChatStatus chatStatus = new ChatStatus();
             chatEntity chat = chatRepository.findById(i).get();
@@ -108,12 +109,13 @@ public class ChatServiceImpl implements ChatService {
             List<userEntity> userEntities = chat.getUserChat();
             userEntities.remove(user);
             for (userEntity user1: userEntities){
-                boolean statusUser = userService.getUserActive(user1.getUserId());
-                if (statusUser){
-                    status = statusUser;
-                }
+//                boolean statusUser = userService.getUserActive(user1.getUserId());
+//                if (statusUser){
+                    chatStatus.setStatusChat(userService.getUserActive(user1.getUserId()));
+                System.out.println(userService.getUserActive(user1.getUserId()));
+//                }
             }
-            chatStatus.setStatusChat(status);
+//            chatStatus.setStatusChat(status);
             chatStatuses.add(chatStatus);
         }
         return chatStatuses;
@@ -273,6 +275,22 @@ public class ChatServiceImpl implements ChatService {
         userEntities.remove(user);
         chat.setUserChat(userEntities);
         chatRepository.save(chat);
+    }
+
+    @Override
+    public String changeChatName(String userEmail, int chatId, String chatName) {
+        userEntity user = userRepository.findByEmail(userEmail).get();
+        chatEntity chat = chatRepository.findById(chatId).get();
+        chat.setChatName(chatName);
+        List<messageEntity> message = chat.getMessageEntities();
+        messageEntity messageEntity = new messageEntity();
+        messageEntity.setMessage(user.getUserName() + "named the group " + chatName);
+        messageEntity.setCreateBy(user);
+        messageEntity.setCreateDate(new Date());
+        message.add(messageEntity);
+        chat.setMessageEntities(message);
+        chatEntity chat1 = chatRepository.save(chat);
+        return chat1.getChatName();
     }
 
 

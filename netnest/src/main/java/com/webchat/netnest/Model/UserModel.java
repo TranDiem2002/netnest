@@ -15,6 +15,6 @@ public class UserModel {
     private String userName;
     private String fullName;
     private String base64Image;
-
+    private String statusFollow;
 
 }

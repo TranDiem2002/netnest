@@ -14,14 +14,19 @@ public interface UserService {
 
     List<UserModel> searchUser(String username, String userEmail) throws SQLException;
 
-    UserProfileModel searchDetailUser(String username);
+    UserProfileModel searchDetailUser(String username, String userEmail);
 
     UserProfileModel DetailUser(String username);
 
     void saveFollowing(int userId, String userName);
 
+    void deleteFollowing(int userId, String userEmail);
+
     List<UserModel> following(int userId);
     List<UserModel> followers(int userId);
+
+    List<UserModel> followingUser(int userId, String userEmail);
+    List<UserModel> followersUser(int userId, String userEmail);
 
     void updateInformation(UserProfileModel userProfileModel);
 

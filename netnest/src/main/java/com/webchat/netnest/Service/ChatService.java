@@ -27,4 +27,7 @@ public interface ChatService {
    ChatModel addPeopleChat(String userEmail, int chatId, int userId);
 
    void leaveChat(String userEmail, int chatId);
+
+   String changeChatName(String userEmail, int chatId, String chatName);
+
 }

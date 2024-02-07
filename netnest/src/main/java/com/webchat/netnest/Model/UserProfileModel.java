@@ -13,8 +13,6 @@ import java.util.Date;
 @NoArgsConstructor
 public class UserProfileModel {
 
-//    private Long id;
-
     private int userId;
 
     private String email;
@@ -34,5 +32,7 @@ public class UserProfileModel {
     private int countfollowing;
 
     private int countfollowers;
+
+    private boolean statusFollow;
 
 }

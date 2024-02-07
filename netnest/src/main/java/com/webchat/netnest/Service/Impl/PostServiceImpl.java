@@ -74,26 +74,23 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostModel> getPostHome(String userEmail) {
         userEntity user = userRepository.findByEmail(userEmail).get();
-        Token token = tokenCustomerRepository.findUserId(user.getUserId()).get(0);
-        Date date;
-        if(token.getStatus() == Status.activate){
-            date = token.getTimeLogin();
+        List<Integer> pots = postCustomerRepository.getPostHome(user.getUserId());
+        List<Integer> postId = postCustomerRepository.suggestPost(pots, user.getUserId());
+        for(Integer i :postId){
+            pots.add(i);
         }
-        else {
-            date = token.getLogoutTime();
-        }
-        System.out.println(date);
-        List<Integer> pots = postCustomerRepository.getPostHome(date);
         List<PostModel> postModels =new ArrayList<>();
-        for(int i = pots.size()-1; i>=0; i--){
+        for(int i = 0; i < pots.size(); i++){
             PostModel postModel = new PostModel();
             postEntity postEntity = postRepository.findById(pots.get(i)).get();
             List<userEntity> userLikes = postEntity.getUser();
-            postModel = postMapper.convertToModel(postEntity);
-            postModel.setLikeStatus(userLikes.contains(user));
-            postModel.setFollowStatus(getCheckFollowing(user.getFollowing(),postEntity.getCreateBy()));
-            PostModel postModel1 = this.countLike_Comment(postEntity.getPostID(), postModel);
-            postModels.add(postModel1);
+            if(!userLikes.contains(user)){
+                postModel = postMapper.convertToModel(postEntity);
+                postModel.setLikeStatus(userLikes.contains(user));
+                postModel.setFollowStatus(getCheckFollowing(user.getFollowing(),postEntity.getCreateBy()));
+                PostModel postModel1 = this.countLike_Comment(postEntity.getPostID(), postModel);
+                postModels.add(postModel1);
+            }
         }
         return postModels;
     }
@@ -211,22 +208,66 @@ public class PostServiceImpl implements PostService {
         userEntity user = userRepository.findByEmail(userEmail).get();
         commentEntity comment1 = commentMapper.convertToEntity(commentRequest);
         comment1.setUser(user);
+        comment1.setUserLikes(new ArrayList<>());
+        comment1.setCreateDate(new Date());
         commentEntity savecomment = commentRepository.save(comment1);
         postEntity postEntity = postCustomerRepository.addComment(postId,savecomment);
-        List<commentEntity> commentEntities = postEntity.getCommentEntities();
+        List<commentEntity> commentEntities = postCustomerRepository.getComment(postId);
         List<CommentResponse> commentResponses = new ArrayList<>();
-        for(commentEntity comment: commentEntities){
-            CommentResponse commentResponse = commentMapper.convertToModel(comment);
+        for(commentEntity comment : commentEntities){
+            List<userEntity> userLikes = comment.getUserLikes();
+            CommentResponse commentResponse = new CommentResponse();
+            commentResponse = commentMapper.convertToModel(comment);
+            commentResponse.setCountLike(postCustomerRepository.countLikesComment(comment.getCommentID()));
+            if(userLikes.contains(user)){
+                commentResponse.setStatusLike(true);
+            }
             commentResponses.add(commentResponse);
         }
-        noticeEntity notice = new noticeEntity();
-        List<userEntity> userEntities = new ArrayList<>();
-        userEntities.add(postEntity.getCreateBy());
-        notice.setUserEntities(userEntities);
-        notice.setContentNotice(user.getUserName()+"đã bình luận bài viết của bạn");
-        notice.setCreateNotice(new Date());
-        noticeRepository.save(notice);
+
+//        noticeEntity notice = new noticeEntity();
+//        List<userEntity> userEntities = new ArrayList<>();
+//        userEntities.add(postEntity.getCreateBy());
+//        notice.setUserEntities(userEntities);
+//        notice.setContentNotice(user.getUserName()+"đã bình luận bài viết của bạn");
+//        notice.setCreateNotice(new Date());
+//        noticeRepository.save(notice);
         return commentResponses;
+    }
+
+    @Override
+    public List<CommentResponse> deleteComment(int postId, int commentId, String userEmail) {
+        postEntity post = postRepository.findById(postId).get();
+        List<commentEntity> commentEntities = post.getCommentEntities();
+        commentEntity comment  = commentRepository.findById(commentId).get();
+        commentEntities.remove(comment);
+        post.setCommentEntities(commentEntities);
+        postEntity postEntity= postRepository.save(post);
+        List<commentEntity> comments = postEntity.getCommentEntities();
+        List<CommentResponse> commentResponses = new ArrayList<>();
+        for(commentEntity comm: comments){
+            CommentResponse commentResponse = commentMapper.convertToModel(comm);
+            commentResponses.add(commentResponse);
+        }
+        return commentResponses;
+    }
+
+
+    @Override
+    public CommentResponse deleteLikeComment(int commentId, String userEmail) {
+        userEntity user = userRepository.findByEmail(userEmail).get();
+        commentEntity comment = commentRepository.findById(commentId).get();
+        List<userEntity> userLikes = comment.getUserLikes();
+        if(userLikes.contains(user)){
+            userLikes.remove(user);
+            comment.setUserLikes(userLikes);
+        }
+        commentEntity saveComment = commentRepository.save(comment);
+        CommentResponse commentResponse = commentMapper.convertToModel(saveComment);
+        int countLike = postCustomerRepository.countLikesComment(commentId);
+        commentResponse.setCountLike(countLike);
+        commentResponse.setStatusLike(true);
+        return commentResponse;
     }
 
     @Override
@@ -284,6 +325,21 @@ public class PostServiceImpl implements PostService {
     public List<PostUserModel> getPostUser(String userEmail) {
         userEntity user = userRepository.findByEmail(userEmail).get();
         List<Integer>  postIds = postCustomerRepository.getPostProfile(user.getUserId());
+        List<PostUserModel> postModels = new ArrayList<>();
+        for(Integer i : postIds){
+            postEntity post = postRepository.findById(i).get();
+            if(!post.getImage().isEmpty()|| !post.getVideo().isEmpty()){
+                PostUserModel postModel = postMapper.convertToModelProfile(post);
+                PostUserModel postModel1 =  countLike_Comment(i,postModel);
+                postModels.add(postModel);
+            }
+        }
+        return postModels;
+    }
+
+    @Override
+    public List<PostUserModel> getPostSearchUser(int userId) {
+        List<Integer>  postIds = postCustomerRepository.getPostProfile(userId);
         List<PostUserModel> postModels = new ArrayList<>();
         for(Integer i : postIds){
             postEntity post = postRepository.findById(i).get();

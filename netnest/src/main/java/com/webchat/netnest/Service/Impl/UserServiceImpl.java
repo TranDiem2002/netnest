@@ -77,7 +77,6 @@ public class UserServiceImpl implements UserService {
             List<userEntity> user1 = userCustomerRepository.findUserName(username);
             List<UserProfileModel> userP = new ArrayList<>();
             for (userEntity user : user1) {
-                System.out.println(user.getUserName());
                 String base64Image = this.covertImage(user.getImage().getId());
                 UserProfileModel userProfileModel = userMapper.convertToProfileModel(user, base64Image);
                 userP.add(userProfileModel);
@@ -123,9 +122,14 @@ public class UserServiceImpl implements UserService {
         }
 
         @Override
-        public UserProfileModel searchDetailUser(String username) {
+        public UserProfileModel searchDetailUser(String username, String userEmail) {
             List<UserProfileModel> users = this.searchPUser(username);
             UserProfileModel userP = users.get(0);
+            userEntity user = userRepository.findByEmail(userEmail).get();
+            List<Integer> id = userCustomerRepository.checkFollow(userP.getUserId(), user.getUserId());
+            if(!id.isEmpty()){
+                userP.setStatusFollow(true);
+            }
             int countFollowing = userCustomerRepository.countFollowing(userP.getUserId());
             int countFollowers = userCustomerRepository.countFollowers(userP.getUserId());
             userP.setCountfollowing(countFollowing);
@@ -151,7 +155,19 @@ public class UserServiceImpl implements UserService {
             userCustomerRepository.saveFollowing(userEntity.get(), user);
         }
 
-        @Override
+    @Override
+    public void deleteFollowing(int userId, String userEmail) {
+        userEntity user = userRepository.findByEmail(userEmail).get();
+        userEntity userFollowing = userRepository.findById(userId).get();
+        List<userEntity> userFollowings = user.getFollowing();
+        if(userFollowings.contains(userFollowing)){
+            userFollowings.remove(userFollowing);
+            user.setFollowing( userFollowings);
+            userRepository.save(user);
+        }
+    }
+
+    @Override
         public List<UserModel> following(int userId) {
             List<userEntity> users = userCustomerRepository.following(userId);
             List<UserModel> userFollowing = new ArrayList<>();
@@ -177,8 +193,50 @@ public class UserServiceImpl implements UserService {
             return userFollowers;
         }
 
+    @Override
+    public List<UserModel> followingUser(int userId, String userEmail) {
+            userEntity userEntity = userRepository.findByEmail(userEmail).get();
+            List<userEntity> userFollow = userEntity.getFollowing();
+        List<userEntity> users = userCustomerRepository.following(userId);
+        List<UserModel> userFollowing = new ArrayList<>();
+        for (userEntity user: users){
+            UserModel userModel= userMapper.convertToModel(user);
+            String imageBase64 = this.covertImage(user.getImage().getId());
+            userModel.setBase64Image(imageBase64);
+            if(user == userEntity){
+                userModel.setStatusFollow("you");
+            }
+            if(userFollow.contains(user)){
+                userModel.setStatusFollow("yes");
+            }
+            userFollowing.add(userModel);
+        }
+        return userFollowing;
+    }
 
-        @Override
+    @Override
+    public List<UserModel> followersUser(int userId, String userEmail) {
+        userEntity userEntity = userRepository.findByEmail(userEmail).get();
+        List<userEntity> userFollow = userEntity.getFollowing();
+        List<userEntity> users = userCustomerRepository.followers(userId);
+        List<UserModel> userFollowers = new ArrayList<>();
+        for (userEntity user: users){
+            UserModel userModel= userMapper.convertToModel(user);
+            String imageBase64 = this.covertImage(user.getImage().getId());
+            userModel.setBase64Image(imageBase64);
+            if(user == userEntity){
+                userModel.setStatusFollow("you");
+            }
+            if(userFollow.contains(user)){
+                userModel.setStatusFollow("yes");
+            }
+            userFollowers.add(userModel);
+        }
+        return userFollowers;
+    }
+
+
+    @Override
         public void updateInformation(UserProfileModel userProfileModel) {
             userEntity user = userMapper.convertToEntity(userProfileModel);
             userCustomerRepository.updateDetailInformation(user);
